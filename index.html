@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nitro Gen</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="dist/css/poncho.min.css" rel="stylesheet">
+    <link href="dist/css/icono-arg.css" rel="stylesheet">
+    <style>
+        /* Estilos CSS para la ventana de la consola */
+        .console {
+            background-color: black;
+            color: lime;
+            font-family: monospace;
+            height: 200px;
+            overflow: scroll;
+            white-space: pre-wrap;
+        }
+        .header-container {
+            background-color: #2897d4;
+            padding: 20px 0;
+            text-align: center;
+        }
+        .title {
+            color: white;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header-container">
+            <h1 class="title">Nitro Gen</h1>
+        </div>
+        <div class="console" id="code-console"></div>
+        <center>
+        <button type="button" class="btn btn-success" id="start-button">Iniciar</button>
+        <button type="button" class="btn btn-danger" id="stop-button">Detener</button>
+        <button type="button" class="btn btn-primary" id="copy-button">Copiar</button>
+        <div class="alert alert-success" id="success-message" style="display: none;">
+            <p>Acción Exitosa.</p>
+        </div>
+        <div class="alert alert-info" id="copy-success-message" style="display: none;">
+            <p>Copiado!</p>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <script>
+        const codeConsole = document.getElementById('code-console');
+        const startButton = document.getElementById('start-button');
+        const stopButton = document.getElementById('stop-button');
+        const copyButton = document.getElementById('copy-button');
+        const successMessage = document.getElementById('success-message');
+        const copySuccessMessage = document.getElementById('copy-success-message');
+        let generating = false;
+        let intervalId;
+        let codeCount = 0;
+
+        function generateRandomCode() {
+            const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let code = '';
+            for (let i = 0; i < 4; i++) {
+                for (let j = 0; j < 5; j++) {
+                    code += characters.charAt(Math.floor(Math.random() * characters.length));
+                }
+                if (i < 3) {
+                    code += '-';
+                }
+            }
+            return code;
+        }
+
+        function startGenerating() {
+            generating = true;
+            startButton.disabled = true;
+            stopButton.disabled = false;
+            successMessage.style.display = 'block';
+            setTimeout(() => {
+                successMessage.style.display = 'none';
+            }, 2000); // Ocultar la alerta después de 2 segundos
+            intervalId = setInterval(() => {
+                codeCount++;
+                const code = generateRandomCode();
+                codeConsole.textContent += `Código ${codeCount}: ${code}\n`;
+                codeConsole.scrollTop = codeConsole.scrollHeight;
+            }, 100); // Velocidad de generación ajustable (100 ms)
+        }
+
+        function stopGenerating() {
+            generating = false;
+            startButton.disabled = false;
+            stopButton.disabled = true;
+            successMessage.style.display = 'block';
+            setTimeout(() => {
+                successMessage.style.display = 'none';
+            }, 2000); // Ocultar la alerta después de 2 segundos
+            clearInterval(intervalId);
+        }
+
+        startButton.addEventListener('click', startGenerating);
+        stopButton.addEventListener('click', () => {
+            stopGenerating();
+            copySuccessMessage.style.display = 'none'; // Ocultar el mensaje de copiado
+        });
+        copyButton.addEventListener('click', () => {
+            const textToCopy = Array.from(codeConsole.getElementsByTagName('p')).map(item => item.textContent).join('\n');
+            const textArea = document.createElement('textarea');
+            textArea.value = textToCopy;
+            textArea.setAttribute('readonly', ''); // Agregar el atributo readonly
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            copySuccessMessage.style.display = 'block';
+            setTimeout(() => {
+                copySuccessMessage.style.display = 'none';
+            }, 2000); // Ocultar la alerta después de 2 segundos
+        });
+
+        stopButton.disabled = true;
+    </script>
+
+    <hr>
+    <center>
+        <strong>Información de contacto</strong>
+        <p class="text-muted">zerordia#0</p>
+    </center>
+</body>
+</html>
